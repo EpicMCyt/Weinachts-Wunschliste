@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Weihnachtswunschliste</title>
+    <title>Meine Wunschliste</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -13,17 +13,17 @@
     <!-- Firebase Firestore (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 pb-12 relative">
+<body class="min-h-screen bg-zinc-950 text-zinc-100 pb-12 relative">
 
     <!-- Admin-Button oben links -->
-    <button onclick="loginAdmin()" class="absolute top-4 left-4 text-slate-500 hover:text-emerald-400 p-2 transition-colors">
+    <button onclick="loginAdmin()" class="absolute top-4 left-4 text-zinc-500 hover:text-zinc-300 p-2 transition-colors">
         <i class="fa-solid fa-key text-xl"></i>
     </button>
 
     <!-- Header -->
-    <header class="text-center py-12 px-4 bg-emerald-950 border-b border-emerald-900 shadow-xl">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-red-500 tracking-wide mb-3">🎄 Meine Weihnachtswunschliste 🎁</h1>
-        <p class="text-emerald-200 text-sm md:text-base">Klicke einfach auf eine Karte, um zum Shop zu gelangen.</p>
+    <header class="text-center py-12 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-3">🎁 Meine Wunschliste 🎁</h1>
+        <p class="text-zinc-400 text-sm md:text-base">Klicke einfach auf eine Karte, um zum Shop zu gelangen.</p>
     </header>
 
     <!-- Wunsch-Grid -->
@@ -33,35 +33,35 @@
         </div>
 
         <!-- Admin-Bereich (standardmäßig versteckt) -->
-        <div id="admin-section" class="hidden mt-16 bg-slate-900 p-6 rounded-2xl border border-emerald-500/30 shadow-xl max-w-xl mx-auto">
+        <div id="admin-section" class="hidden mt-16 bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl max-w-xl mx-auto">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-emerald-400"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen (Admin)</h2>
-                <span class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-1 rounded">Admin Aktiv</span>
+                <h2 class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen (Admin)</h2>
+                <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
             </div>
             <form id="add-wish-form" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">Produktname</label>
-                    <input type="text" id="new-title" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="z.B. Nintendo Switch">
+                    <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
+                    <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-1">Preis (€)</label>
-                        <input type="number" step="0.01" id="new-price" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="49.99">
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
+                        <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-1">Bild-URL</label>
-                        <input type="url" id="new-image" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="https://...">
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL</label>
+                        <input type="url" id="new-image" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">Shop-Link</label>
-                    <input type="url" id="new-link" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="https://amazon.de/...">
+                    <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
+                    <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">Kommentar</label>
-                    <textarea id="new-desc" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                    <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
+                    <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
+                <button type="submit" class="w-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
                     Wunsch speichern
                 </button>
             </form>
@@ -86,6 +86,7 @@
         const container = document.getElementById('wishlist-container');
         const adminSection = document.getElementById('admin-section');
 
+        // Admin-Status
         let isAdmin = false;
 
         // Admin Login mit Code "Epicmc"
@@ -107,7 +108,7 @@
                 container.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    container.innerHTML = '<p class="col-span-full text-center text-slate-400 py-8">Noch keine Wünsche vorhanden.</p>';
+                    container.innerHTML = '<p class="col-span-full text-center text-zinc-400 py-8">Noch keine Wünsche vorhanden.</p>';
                     return;
                 }
 
@@ -121,19 +122,21 @@
                     card.href = wish.link;
                     card.target = "_blank";
                     card.rel = "noopener noreferrer";
-                    card.className = `block bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-emerald-600/50'}`;
+                    card.className = `block bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-zinc-600'}`;
                     
+                    // Admin Lösch-Icon (nur sichtbar im Admin-Modus)
                     const deleteButtonHtml = isAdmin ? `
                         <button onclick="deleteWish(event, '${id}')" class="absolute top-3 right-3 bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors z-10" title="Wunsch löschen">
                             <i class="fa-solid fa-trash-can text-sm"></i>
                         </button>` : '';
 
+                    // Reserviert-Badge
                     const reservedBadgeHtml = isReserved ? `
-                        <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-red-950 text-red-300 text-xs px-3 py-1 rounded-full font-bold border border-red-800">Reserviert</span>` : '';
+                        <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-zinc-950 text-zinc-300 text-xs px-3 py-1 rounded-full font-bold border border-zinc-700">Reserviert</span>` : '';
 
                     card.innerHTML = `
                         <div>
-                            <div class="h-52 overflow-hidden relative bg-slate-800">
+                            <div class="h-52 overflow-hidden relative bg-zinc-800">
                                 <img src="${wish.image}" alt="${wish.title}" class="w-full h-full object-cover">
                                 ${reservedBadgeHtml}
                                 ${deleteButtonHtml}
@@ -141,13 +144,13 @@
                             <div class="p-5">
                                 <div class="flex justify-between items-start mb-2 gap-2">
                                     <h3 class="text-lg font-bold text-white">${wish.title}</h3>
-                                    <span class="bg-red-950 text-red-300 text-sm px-3 py-1 rounded-full font-bold border border-red-800 shrink-0">${Number(wish.price).toFixed(2).replace('.', ',')} €</span>
+                                    <span class="bg-zinc-800 text-zinc-200 text-sm px-3 py-1 rounded-full font-bold border border-zinc-700 shrink-0">${Number(wish.price).toFixed(2).replace('.', ',')} €</span>
                                 </div>
-                                ${commentText ? `<p class="text-slate-400 text-sm mb-4"><i class="fa-regular fa-comment text-emerald-400 mr-1.5"></i>${commentText}</p>` : ''}
+                                ${commentText ? `<p class="text-zinc-400 text-sm mb-4"><span class="font-semibold text-zinc-300">Kommentar:</span> ${commentText}</p>` : ''}
                             </div>
                         </div>
                         <div class="p-5 pt-0">
-                            <button onclick="toggleReserve(event, '${id}', ${isReserved})" class="w-full ${isReserved ? 'bg-slate-700 hover:bg-slate-600 text-slate-200' : 'bg-red-900 hover:bg-red-800 text-white'} text-sm py-2.5 px-3 rounded-xl font-medium transition-colors shadow-lg">
+                            <button onclick="toggleReserve(event, '${id}', ${isReserved})" class="w-full ${isReserved ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700' : 'bg-zinc-100 hover:bg-white text-zinc-900'} text-sm py-2.5 px-3 rounded-xl font-semibold transition-colors shadow-lg">
                                 ${isReserved ? 'Freigeben' : 'Reservieren'}
                             </button>
                         </div>
@@ -157,6 +160,7 @@
             });
         }
 
+        // Initiales Laden
         loadWishlist();
 
         // Wunsch löschen
