@@ -33,11 +33,11 @@
 
         <!-- Admin-Bereich (standardmäßig versteckt) -->
         <div id="admin-section" class="hidden mt-16 space-y-10 max-w-xl mx-auto">
-            
-            <!-- Neuen Wunsch hinzufügen -->
+
+            <!-- Wunsch hinzufügen / bearbeiten -->
             <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
+                    <h2 id="form-title" class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
                     <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
                 </div>
                 <form id="add-wish-form" class="space-y-4">
@@ -63,9 +63,14 @@
                         <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
                         <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
-                        Wunsch speichern
-                    </button>
+                    <div class="flex gap-3">
+                        <button type="submit" id="submit-btn" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
+                            Wunsch speichern
+                        </button>
+                        <button type="button" id="cancel-edit-btn" onclick="resetWishForm()" class="hidden bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700">
+                            Abbrechen
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -120,8 +125,9 @@
         const adminSection = document.getElementById('admin-section');
         const suggestionsContainer = document.getElementById('suggestions-container');
 
-        // Admin-Status
+        // Admin-Status & Bearbeitungs-ID
         let isAdmin = false;
+        let editingWishId = null;
 
         // Admin Login mit Code "Epicmc"
         window.loginAdmin = function() {
@@ -141,7 +147,7 @@
         function loadWishlist() {
             db.collection('wishes').onSnapshot((snapshot) => {
                 container.innerHTML = '';
-                
+
                 if (snapshot.empty) {
                     container.innerHTML = '<p class="col-span-full text-center text-zinc-400 py-8">Noch keine Wünsche vorhanden.</p>';
                     return;
@@ -158,11 +164,17 @@
                     card.target = "_blank";
                     card.rel = "noopener noreferrer";
                     card.className = `block bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-zinc-600'}`;
-                    
-                    const deleteButtonHtml = isAdmin ? `
-                        <button onclick="deleteWish(event, '${id}')" class="absolute top-3 right-3 bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors z-10" title="Wunsch löschen">
-                            <i class="fa-solid fa-trash-can text-sm"></i>
-                        </button>` : '';
+
+                    // Admin-Buttons oben rechts (Stift & Mülleimer)
+                    const adminButtonsHtml = isAdmin ? `
+                        <div class="absolute top-3 right-3 flex gap-2 z-10">
+                            <button onclick="editWish(event, '${id}', '${encodeURIComponent(wish.title)}', ${wish.price}, '${encodeURIComponent(wish.image)}', '${encodeURIComponent(wish.link)}', '${encodeURIComponent(commentText)}')" class="bg-blue-600 hover:bg-blue-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors" title="Wunsch bearbeiten">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteWish(event, '${id}')" class="bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors" title="Wunsch löschen">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>` : '';
 
                     const reservedBadgeHtml = isReserved ? `
                         <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-zinc-950 text-zinc-300 text-xs px-3 py-1 rounded-full font-bold border border-zinc-700">Reserviert</span>` : '';
@@ -172,7 +184,7 @@
                             <div class="h-52 w-full overflow-hidden relative bg-zinc-950 flex items-center justify-center p-3">
                                 <img src="${wish.image}" alt="${wish.title}" class="max-h-full max-w-full object-contain">
                                 ${reservedBadgeHtml}
-                                ${deleteButtonHtml}
+                                ${adminButtonsHtml}
                             </div>
                             <div class="p-5">
                                 <div class="flex justify-between items-start mb-2 gap-2">
@@ -200,7 +212,7 @@
         function loadSuggestions() {
             db.collection('suggestions').onSnapshot((snapshot) => {
                 suggestionsContainer.innerHTML = '';
-                
+
                 if (snapshot.empty) {
                     suggestionsContainer.innerHTML = '<p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>';
                     return;
@@ -250,22 +262,48 @@
             });
         });
 
-        // Vorschlag akzeptieren (füllt das Formular oben aus und löscht den Vorschlag)
+        // Vorschlag akzeptieren
         window.acceptSuggestion = function(id, title, link, comment) {
+            resetWishForm();
             document.getElementById('new-title').value = decodeURIComponent(title);
             document.getElementById('new-link').value = decodeURIComponent(link);
             document.getElementById('new-desc').value = decodeURIComponent(comment);
-            
-            // Zum Formular hochscrollen
+
             document.getElementById('add-wish-form').scrollIntoView({ behavior: 'smooth' });
-            
-            // Aus Vorschlägen löschen
             db.collection('suggestions').doc(id).delete();
         };
 
         // Vorschlag ablehnen / löschen
         window.deleteSuggestion = function(id) {
             db.collection('suggestions').doc(id).delete();
+        };
+
+        // Wunsch bearbeiten (Daten ins Formular laden)
+        window.editWish = function(event, id, title, price, image, link, desc) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            editingWishId = id;
+            document.getElementById('new-title').value = decodeURIComponent(title);
+            document.getElementById('new-price').value = price;
+            document.getElementById('new-image').value = decodeURIComponent(image);
+            document.getElementById('new-link').value = decodeURIComponent(link);
+            document.getElementById('new-desc').value = decodeURIComponent(desc);
+
+            document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen mr-2"></i> Wunsch bearbeiten';
+            document.getElementById('submit-btn').textContent = 'Änderungen speichern';
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+            document.getElementById('add-wish-form').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Formular nach dem Bearbeiten/Abbrechen zurücksetzen
+        window.resetWishForm = function() {
+            editingWishId = null;
+            document.getElementById('add-wish-form').reset();
+            document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen';
+            document.getElementById('submit-btn').textContent = 'Wunsch speichern';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
         };
 
         // Wunsch löschen
@@ -287,24 +325,39 @@
             });
         };
 
-        // Neuen Wunsch hinzufügen
+        // Neuen Wunsch hinzufügen oder bestehenden aktualisieren
         const form = document.getElementById('add-wish-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            db.collection('wishes').add({
+
+            const wishData = {
                 title: document.getElementById('new-title').value,
                 price: parseFloat(document.getElementById('new-price').value),
                 image: document.getElementById('new-image').value,
                 link: document.getElementById('new-link').value,
-                description: document.getElementById('new-desc').value,
-                reserved: false
-            }).then(() => {
-                form.reset();
-                alert('Wunsch erfolgreich hinzugefügt!');
-            }).catch((error) => {
-                console.error("Fehler beim Speichern: ", error);
-                alert('Fehler beim Speichern.');
-            });
+                description: document.getElementById('new-desc').value
+            };
+
+            if (editingWishId) {
+                // Bearbeiten
+                db.collection('wishes').doc(editingWishId).update(wishData).then(() => {
+                    resetWishForm();
+                    alert('Wunsch erfolgreich aktualisiert!');
+                }).catch((error) => {
+                    console.error("Fehler beim Aktualisieren: ", error);
+                    alert('Fehler beim Aktualisieren.');
+                });
+            } else {
+                // Neu erstellen
+                wishData.reserved = false;
+                db.collection('wishes').add(wishData).then(() => {
+                    resetWishForm();
+                    alert('Wunsch erfolgreich hinzugefügt!');
+                }).catch((error) => {
+                    console.error("Fehler beim Speichern: ", error);
+                    alert('Fehler beim Speichern.');
+                });
+            }
         });
     </script>
 </body>
