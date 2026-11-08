@@ -3,14 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Japan Quiz</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Meine Weihnachtswunschliste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase App (Core) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+        .reserved-card { opacity: 0.65; filter: grayscale(50%); }
+    </style>
 </head>
-<body>
+<body class="min-h-screen bg-slate-950 text-slate-100 pb-12">
+    <!-- Header -->
+    <header class="text-center py-12 px-4 bg-emerald-950 border-b border-emerald-900 shadow-xl">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-red-500 tracking-wide mb-3"> Meine Wunschliste </h1>
+        <p class="text-emerald-200 text-sm md:text-base">Klicke auf "Reservieren", um Doppelkauf zu vermeiden.</p>
+    </header>
 
-    <div class="quiz-container" id="quiz">
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 mt-10">
+        <div id="loading" class="text-center py-12 text-slate-400">
+            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i>
+            <p>Wünsche werden geladen...</p>
         </div>
+        <div id="wishlist" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+    </main>
 
-    <script src="script.js"></script>
+    <script>
+        // Firebase Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCffMmleSrb1Dx7WF9JoFyx98AY9opN6Wc",
+            authDomain: "wunschliste-94d0e.firebaseapp.com",
+            projectId: "wunschliste-94d0e",
+            storageBucket: "wunschliste-94d0e.firebasestorage.app",
+            messagingSenderId: "504589702635",
+            appId: "1:504589702635:web:b4dee1c88bbbc9562b35ae"
+        };
+
+        // Firebase initialisieren
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const container = document.getElementById('wishlist');
+        const loading = document.getElementById('loading');
+
+        // Echtzeit-Listener für die Firestore-Sammlung "wishes"
+        db.collection("wishes").onSnapshot((snapshot) => {
+            loading.classList.add('hidden');
+            container.classList.remove('hidden');
+
+            if (snapshot.empty) {
+                container.innerHTML = '<p class="text-center text-slate-400 col-span-full">Noch keine Wünsche in der Datenbank gefunden. Lege in Firebase eine Sammlung namens "wishes" an.</p>';
+                return;
+            }
+
+            let html = "";
+            snapshot.forEach((doc) => {
+                const item = doc.data();
+                const id = doc.id;
+                
+                html += `
+                    <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col ${item.reserved ? 'reserved-card' : ''}">
+                        <img src="${item.image || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=500&q=80'}" alt="${item.title}" class="w-full h-52 object-cover">
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-2 gap-2">
+                                    <h3 class="text-lg font-bold text-white ${item.reserved ? 'line-through text-slate-400' : ''}">${item.title}</h3>
+                                    <span class="bg-red-950 text-red-300 text-sm px-3 py-1 rounded-full font-bold border border-red-800 shrink-0">${Number(item.price).toFixed(2)} €</span>
+                                </div>
+                                <p class="text-slate-400 text-sm mb-6">${item.description}</p>
+                            </div>
+                            <div class="space-y-3">
+                                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="w-full block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2 px-4 rounded-xl transition-colors">
+                                    <i class="fa-solid fa-cart-shopping mr-2"></i>Zum Shop
+                                </a>
+                                ${item.reserved ? `
+                                    <button onclick="toggleReserve('${id}', false)" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-medium py-2 px-4 rounded-xl border border-slate-700 transition-colors">
+                                        <i class="fa-solid fa-lock mr-2"></i>Reserviert (Freigeben?)
+                                    </button>
+                                ` : `
+                                    <button onclick="toggleReserve('${id}', true)" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-lg">
+                                        <i class="fa-solid fa-gift mr-2"></i>Für mich reservieren
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }, (error) => {
+            console.error("Fehler beim Laden:", error);
+            loading.innerHTML = '<p class="text-red-400">Fehler beim Laden der Wunschliste. Bitte Firestore-Regeln und Testmodus prüfen.</p>';
+        });
+
+        // Status in Firestore aktualisieren
+        async function toggleReserve(id, status) {
+            try {
+                await db.collection("wishes").doc(id).update({
+                    reserved: status
+                });
+            } catch (err) {
+                console.error("Fehler:", err);
+                alert("Fehler beim Speichern.");
+            }
+        }
+    </script>
 </body>
 </html>
