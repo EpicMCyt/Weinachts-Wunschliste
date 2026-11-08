@@ -124,7 +124,7 @@
                     card.rel = "noopener noreferrer";
                     card.className = `block bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-zinc-600'}`;
                     
-                    // Admin Lösch-Icon (nur sichtbar im Admin-Modus)
+                    // Admin Lösch-Icon
                     const deleteButtonHtml = isAdmin ? `
                         <button onclick="deleteWish(event, '${id}')" class="absolute top-3 right-3 bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors z-10" title="Wunsch löschen">
                             <i class="fa-solid fa-trash-can text-sm"></i>
@@ -136,8 +136,8 @@
 
                     card.innerHTML = `
                         <div>
-                            <div class="h-52 overflow-hidden relative bg-zinc-800">
-                                <img src="${wish.image}" alt="${wish.title}" class="w-full h-full object-cover">
+                            <div class="h-52 w-full overflow-hidden relative bg-zinc-950 flex items-center justify-center p-3">
+                                <img src="${wish.image}" alt="${wish.title}" class="max-h-full max-w-full object-contain">
                                 ${reservedBadgeHtml}
                                 ${deleteButtonHtml}
                             </div>
