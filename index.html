@@ -4,111 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meine Weihnachtswunschliste</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase App (Core) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <style>
-        .reserved-card { opacity: 0.65; filter: grayscale(50%); }
-    </style>
+    <!-- Firebase App (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100 pb-12">
     <!-- Header -->
     <header class="text-center py-12 px-4 bg-emerald-950 border-b border-emerald-900 shadow-xl">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-red-500 tracking-wide mb-3"> Meine Wunschliste </h1>
-        <p class="text-emerald-200 text-sm md:text-base">Klicke auf "Reservieren", um Doppelkauf zu vermeiden.</p>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-red-500 tracking-wide mb-3">🎄 Meine Weihnachtswunschliste 🎁</h1>
+        <p class="text-emerald-200 text-sm md:text-base">Hier findest du eine Übersicht meiner Wünsche inklusive Shop-Links.</p>
     </header>
 
-    <!-- Main Content -->
+    <!-- Wunsch-Grid -->
     <main class="max-w-6xl mx-auto px-4 mt-10">
-        <div id="loading" class="text-center py-12 text-slate-400">
-            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i>
-            <p>Wünsche werden geladen...</p>
+        <div id="wishlist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Wünsche werden hier automatisch in Echtzeit geladen -->
         </div>
-        <div id="wishlist" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
+
+        <!-- Admin-Bereich zum Hinzufügen neuer Wünsche direkt vom Handy -->
+        <div class="mt-16 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl max-w-xl mx-auto">
+            <h2 class="text-xl font-semibold mb-4 text-emerald-400"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
+            <form id="add-wish-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Produktname</label>
+                    <input type="text" id="new-title" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="z.B. Nintendo Switch">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Preis (€)</label>
+                        <input type="number" step="0.01" id="new-price" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="49.99">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-1">Bild-URL</label>
+                        <input type="url" id="new-image" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="https://...">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Shop-Link</label>
+                    <input type="url" id="new-link" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="https://amazon.de/...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Beschreibung</label>
+                    <textarea id="new-desc" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="Farbe, Größe, Details..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
+                    Wunsch speichern
+                </button>
+            </form>
+        </div>
     </main>
 
     <script>
-        // Firebase Konfiguration
+        // Firebase Konfiguration (Deine Projekt-ID "wunschliste-94d0e" ist schon hinterlegt)
         const firebaseConfig = {
-            apiKey: "AIzaSyCffMmleSrb1Dx7WF9JoFyx98AY9opN6Wc",
+            apiKey: "HIER_DEINEN_API_KEY_EINTRAGEN", 
             authDomain: "wunschliste-94d0e.firebaseapp.com",
             projectId: "wunschliste-94d0e",
-            storageBucket: "wunschliste-94d0e.firebasestorage.app",
+            storageBucket: "wunschliste-94d0e.appspot.com",
             messagingSenderId: "504589702635",
-            appId: "1:504589702635:web:b4dee1c88bbbc9562b35ae"
+            appId: "HIER_DEINE_APP_ID_EINTRAGEN"
         };
 
         // Firebase initialisieren
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const container = document.getElementById('wishlist');
-        const loading = document.getElementById('loading');
+        const container = document.getElementById('wishlist-container');
 
-        // Echtzeit-Listener für die Firestore-Sammlung "wishes"
-        db.collection("wishes").onSnapshot((snapshot) => {
-            loading.classList.add('hidden');
-            container.classList.remove('hidden');
-
+        // Wünsche in Echtzeit aus der Sammlung "wishes" laden
+        db.collection('wishes').onSnapshot((snapshot) => {
+            container.innerHTML = '';
+            
             if (snapshot.empty) {
-                container.innerHTML = '<p class="text-center text-slate-400 col-span-full">Noch keine Wünsche in der Datenbank gefunden. Lege in Firebase eine Sammlung namens "wishes" an.</p>';
+                container.innerHTML = '<p class="col-span-full text-center text-slate-400 py-8">Noch keine Wünsche vorhanden. Füg unten welche hinzu!</p>';
                 return;
             }
 
-            let html = "";
             snapshot.forEach((doc) => {
-                const item = doc.data();
+                const wish = doc.data();
                 const id = doc.id;
+                const isReserved = wish.reserved || false;
+
+                const card = document.createElement('div');
+                card.className = `bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02]'}`;
                 
-                html += `
-                    <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col ${item.reserved ? 'reserved-card' : ''}">
-                        <img src="${item.image || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=500&q=80'}" alt="${item.title}" class="w-full h-52 object-cover">
-                        <div class="p-5 flex-1 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-2 gap-2">
-                                    <h3 class="text-lg font-bold text-white ${item.reserved ? 'line-through text-slate-400' : ''}">${item.title}</h3>
-                                    <span class="bg-red-950 text-red-300 text-sm px-3 py-1 rounded-full font-bold border border-red-800 shrink-0">${Number(item.price).toFixed(2)} €</span>
-                                </div>
-                                <p class="text-slate-400 text-sm mb-6">${item.description}</p>
+                card.innerHTML = `
+                    <div>
+                        <div class="h-52 overflow-hidden relative bg-slate-800">
+                            <img src="${wish.image}" alt="${wish.title}" class="w-full h-full object-cover">
+                            ${isReserved ? '<span class="absolute top-3 right-3 bg-red-950 text-red-300 text-xs px-3 py-1 rounded-full font-bold border border-red-800">Reserviert</span>' : ''}
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2 gap-2">
+                                <h3 class="text-lg font-bold text-white">${wish.title}</h3>
+                                <span class="bg-red-950 text-red-300 text-sm px-3 py-1 rounded-full font-bold border border-red-800 shrink-0">${Number(wish.price).toFixed(2).replace('.', ',')} €</span>
                             </div>
-                            <div class="space-y-3">
-                                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="w-full block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2 px-4 rounded-xl transition-colors">
-                                    <i class="fa-solid fa-cart-shopping mr-2"></i>Zum Shop
-                                </a>
-                                ${item.reserved ? `
-                                    <button onclick="toggleReserve('${id}', false)" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 font-medium py-2 px-4 rounded-xl border border-slate-700 transition-colors">
-                                        <i class="fa-solid fa-lock mr-2"></i>Reserviert (Freigeben?)
-                                    </button>
-                                ` : `
-                                    <button onclick="toggleReserve('${id}', true)" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 px-4 rounded-xl transition-colors shadow-lg">
-                                        <i class="fa-solid fa-gift mr-2"></i>Für mich reservieren
-                                    </button>
-                                `}
-                            </div>
+                            <p class="text-slate-400 text-sm mb-6">${wish.description || ''}</p>
                         </div>
                     </div>
+                    <div class="p-5 pt-0 flex gap-3">
+                        <a href="${wish.link}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 px-3 rounded-xl transition-colors shadow-lg text-sm">
+                            <i class="fa-solid fa-cart-shopping mr-1"></i>Zum Shop
+                        </a>
+                        <button onclick="toggleReserve('${id}', ${isReserved})" class="flex-1 ${isReserved ? 'bg-slate-700 hover:bg-slate-600 text-slate-200' : 'bg-red-900 hover:bg-red-800 text-white'} text-sm py-2.5 px-3 rounded-xl font-medium transition-colors shadow-lg">
+                            ${isReserved ? 'Freigeben' : 'Reservieren'}
+                        </button>
+                    </div>
                 `;
+                container.appendChild(card);
             });
-            container.innerHTML = html;
-        }, (error) => {
-            console.error("Fehler beim Laden:", error);
-            loading.innerHTML = '<p class="text-red-400">Fehler beim Laden der Wunschliste. Bitte Firestore-Regeln und Testmodus prüfen.</p>';
         });
 
-        // Status in Firestore aktualisieren
-        async function toggleReserve(id, status) {
-            try {
-                await db.collection("wishes").doc(id).update({
-                    reserved: status
-                });
-            } catch (err) {
-                console.error("Fehler:", err);
-                alert("Fehler beim Speichern.");
-            }
-        }
+        // Reservierungsstatus umschalten
+        window.toggleReserve = function(id, currentStatus) {
+            db.collection('wishes').doc(id).update({
+                reserved: !currentStatus
+            });
+        };
+
+        // Neuen Wunsch über das Formular speichern
+        const form = document.getElementById('add-wish-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            db.collection('wishes').add({
+                title: document.getElementById('new-title').value,
+                price: parseFloat(document.getElementById('new-price').value),
+                image: document.getElementById('new-image').value,
+                link: document.getElementById('new-link').value,
+                description: document.getElementById('new-desc').value,
+                reserved: false
+            }).then(() => {
+                form.reset();
+                alert('Wunsch erfolgreich hinzugefügt!');
+            }).catch((error) => {
+                console.error("Fehler beim Speichern: ", error);
+                alert('Fehler beim Speichern.');
+            });
+        });
     </script>
 </body>
 </html>
