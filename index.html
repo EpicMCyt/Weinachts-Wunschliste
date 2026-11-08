@@ -16,14 +16,14 @@
 <body class="min-h-screen bg-slate-950 text-slate-100 pb-12 relative">
 
     <!-- Admin-Button oben links -->
-    <button onclick="loginAdmin()" class="absolute top-4 left-4 text-slate-500 hover:text-gray-400 p-2 transition-colors">
+    <button onclick="loginAdmin()" class="absolute top-4 left-4 text-slate-500 hover:text-emerald-400 p-2 transition-colors">
         <i class="fa-solid fa-key text-xl"></i>
     </button>
 
     <!-- Header -->
-    <header class="text-center py-12 px-4 bg-emerald-950 border-b border-gray-900 shadow-xl">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-white-500 tracking-wide mb-3">Weihnachtswunschliste von Luca</h1>
-        <p class="text-gray-200 text-sm md:text-base">Klicke einfach auf eine Karte, um zum Shop zu gelangen.</p>
+    <header class="text-center py-12 px-4 bg-emerald-950 border-b border-emerald-900 shadow-xl">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-red-500 tracking-wide mb-3">🎄 Meine Weihnachtswunschliste 🎁</h1>
+        <p class="text-emerald-200 text-sm md:text-base">Klicke einfach auf eine Karte, um zum Shop zu gelangen.</p>
     </header>
 
     <!-- Wunsch-Grid -->
@@ -86,61 +86,89 @@
         const container = document.getElementById('wishlist-container');
         const adminSection = document.getElementById('admin-section');
 
+        let isAdmin = false;
+
         // Admin Login mit Code "Epicmc"
         window.loginAdmin = function() {
             const code = prompt("Admin Code eingeben:");
             if (code === "Epicmc") {
+                isAdmin = true;
                 adminSection.classList.remove('hidden');
                 adminSection.scrollIntoView({ behavior: 'smooth' });
+                loadWishlist();
             } else if (code !== null) {
                 alert("Falscher Code!");
             }
         };
 
         // Wünsche in Echtzeit laden
-        db.collection('wishes').onSnapshot((snapshot) => {
-            container.innerHTML = '';
-            
-            if (snapshot.empty) {
-                container.innerHTML = '<p class="col-span-full text-center text-slate-400 py-8">Noch keine Wünsche vorhanden.</p>';
-                return;
-            }
-
-            snapshot.forEach((doc) => {
-                const wish = doc.data();
-                const id = doc.id;
-                const isReserved = wish.reserved || false;
-                const commentText = wish.description || wish.comment || '';
-
-                const card = document.createElement('a');
-                card.href = wish.link;
-                card.target = "_blank";
-                card.rel = "noopener noreferrer";
-                card.className = `block bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-emerald-600/50'}`;
+        function loadWishlist() {
+            db.collection('wishes').onSnapshot((snapshot) => {
+                container.innerHTML = '';
                 
-                card.innerHTML = `
-                    <div>
-                        <div class="h-52 overflow-hidden relative bg-slate-800">
-                            <img src="${wish.image}" alt="${wish.title}" class="w-full h-full object-cover">
-                            ${isReserved ? '<span class="absolute top-3 right-3 bg-red-950 text-red-300 text-xs px-3 py-1 rounded-full font-bold border border-red-800">Reserviert</span>' : ''}
-                        </div>
-                        <div class="p-5">
-                            <div class="flex justify-between items-start mb-2 gap-2">
-                                <h3 class="text-lg font-bold text-white">${wish.title}</h3>
-                                <span class="bg-red-950 text-red-300 text-sm px-3 py-1 rounded-full font-bold border border-red-800 shrink-0">${Number(wish.price).toFixed(2).replace('.', ',')} €</span>
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="col-span-full text-center text-slate-400 py-8">Noch keine Wünsche vorhanden.</p>';
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const wish = doc.data();
+                    const id = doc.id;
+                    const isReserved = wish.reserved || false;
+                    const commentText = wish.description || wish.comment || '';
+
+                    const card = document.createElement('a');
+                    card.href = wish.link;
+                    card.target = "_blank";
+                    card.rel = "noopener noreferrer";
+                    card.className = `block bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-emerald-600/50'}`;
+                    
+                    const deleteButtonHtml = isAdmin ? `
+                        <button onclick="deleteWish(event, '${id}')" class="absolute top-3 right-3 bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors z-10" title="Wunsch löschen">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>` : '';
+
+                    const reservedBadgeHtml = isReserved ? `
+                        <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-red-950 text-red-300 text-xs px-3 py-1 rounded-full font-bold border border-red-800">Reserviert</span>` : '';
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="h-52 overflow-hidden relative bg-slate-800">
+                                <img src="${wish.image}" alt="${wish.title}" class="w-full h-full object-cover">
+                                ${reservedBadgeHtml}
+                                ${deleteButtonHtml}
                             </div>
-                            ${commentText ? `<p class="text-slate-400 text-sm mb-4"><i class="fa-regular fa-comment text-emerald-400 mr-1.5"></i>${commentText}</p>` : ''}
+                            <div class="p-5">
+                                <div class="flex justify-between items-start mb-2 gap-2">
+                                    <h3 class="text-lg font-bold text-white">${wish.title}</h3>
+                                    <span class="bg-red-950 text-red-300 text-sm px-3 py-1 rounded-full font-bold border border-red-800 shrink-0">${Number(wish.price).toFixed(2).replace('.', ',')} €</span>
+                                </div>
+                                ${commentText ? `<p class="text-slate-400 text-sm mb-4"><i class="fa-regular fa-comment text-emerald-400 mr-1.5"></i>${commentText}</p>` : ''}
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-5 pt-0">
-                        <button onclick="toggleReserve(event, '${id}', ${isReserved})" class="w-full ${isReserved ? 'bg-slate-700 hover:bg-slate-600 text-slate-200' : 'bg-red-900 hover:bg-red-800 text-white'} text-sm py-2.5 px-3 rounded-xl font-medium transition-colors shadow-lg">
-                            ${isReserved ? 'Freigeben' : 'Reservieren'}
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
+                        <div class="p-5 pt-0">
+                            <button onclick="toggleReserve(event, '${id}', ${isReserved})" class="w-full ${isReserved ? 'bg-slate-700 hover:bg-slate-600 text-slate-200' : 'bg-red-900 hover:bg-red-800 text-white'} text-sm py-2.5 px-3 rounded-xl font-medium transition-colors shadow-lg">
+                                ${isReserved ? 'Freigeben' : 'Reservieren'}
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
             });
-        });
+        }
+
+        loadWishlist();
+
+        // Wunsch löschen
+        window.deleteWish = function(event, id) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            db.collection('wishes').doc(id).delete().catch((error) => {
+                console.error("Fehler beim Löschen: ", error);
+                alert("Fehler beim Löschen des Wunsches.");
+            });
+        };
 
         // Reservierungsstatus umschalten
         window.toggleReserve = function(event, id, currentStatus) {
