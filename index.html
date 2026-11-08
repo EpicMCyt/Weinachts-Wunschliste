@@ -32,36 +32,70 @@
         </div>
 
         <!-- Admin-Bereich (standardmäßig versteckt) -->
-        <div id="admin-section" class="hidden mt-16 bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl max-w-xl mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
-                <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
+        <div id="admin-section" class="hidden mt-16 space-y-10 max-w-xl mx-auto">
+            
+            <!-- Neuen Wunsch hinzufügen -->
+            <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
+                    <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
+                </div>
+                <form id="add-wish-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
+                        <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
+                            <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL</label>
+                            <input type="url" id="new-image" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
+                        <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
+                        <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
+                        Wunsch speichern
+                    </button>
+                </form>
             </div>
-            <form id="add-wish-form" class="space-y-4">
+
+            <!-- Eingegangene Vorschläge (Nur im Admin-Modus sichtbar) -->
+            <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
+                <h2 class="text-xl font-semibold text-zinc-200 mb-4"><i class="fa-solid fa-lightbulb mr-2 text-yellow-400"></i> Eingegangene Vorschläge</h2>
+                <div id="suggestions-container" class="space-y-4">
+                    <!-- Vorschläge werden hier geladen -->
+                    <p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Vorschlags-Bereich für alle Besucher -->
+        <div class="mt-20 bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800 shadow-xl max-w-xl mx-auto">
+            <h2 class="text-lg font-semibold text-zinc-200 mb-2"><i class="fa-solid fa-comment-dots mr-2"></i> Idee oder Wunsch vorschlagen</h2>
+            <p class="text-zinc-400 text-xs mb-4">Hast du eine Idee, was ich mir wünschen könnte? Schlage es hier vor!</p>
+            <form id="suggestion-form" class="space-y-3">
                 <div>
-                    <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
-                    <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
-                        <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL</label>
-                        <input type="url" id="new-image" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
-                    </div>
+                    <input type="text" id="sug-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Idee / Produktname *">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
-                    <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
+                    <input type="url" id="sug-link" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Shop-Link (optional)">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
-                    <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                    <textarea id="sug-comment" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Kommentar / Warum das eine gute Idee ist (optional)"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
-                    Wunsch speichern
+                <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium py-2.5 px-4 rounded-xl text-sm transition-colors shadow">
+                    Vorschlag abschicken
                 </button>
             </form>
         </div>
@@ -84,6 +118,7 @@
 
         const container = document.getElementById('wishlist-container');
         const adminSection = document.getElementById('admin-section');
+        const suggestionsContainer = document.getElementById('suggestions-container');
 
         // Admin-Status
         let isAdmin = false;
@@ -96,6 +131,7 @@
                 adminSection.classList.remove('hidden');
                 adminSection.scrollIntoView({ behavior: 'smooth' });
                 loadWishlist();
+                loadSuggestions();
             } else if (code !== null) {
                 alert("Falscher Code!");
             }
@@ -123,13 +159,11 @@
                     card.rel = "noopener noreferrer";
                     card.className = `block bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-zinc-600'}`;
                     
-                    // Admin Lösch-Icon
                     const deleteButtonHtml = isAdmin ? `
                         <button onclick="deleteWish(event, '${id}')" class="absolute top-3 right-3 bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors z-10" title="Wunsch löschen">
                             <i class="fa-solid fa-trash-can text-sm"></i>
                         </button>` : '';
 
-                    // Reserviert-Badge
                     const reservedBadgeHtml = isReserved ? `
                         <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-zinc-950 text-zinc-300 text-xs px-3 py-1 rounded-full font-bold border border-zinc-700">Reserviert</span>` : '';
 
@@ -162,11 +196,82 @@
         // Initiales Laden
         loadWishlist();
 
+        // Vorschläge in Echtzeit laden (nur für Admin)
+        function loadSuggestions() {
+            db.collection('suggestions').onSnapshot((snapshot) => {
+                suggestionsContainer.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    suggestionsContainer.innerHTML = '<p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>';
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const sug = doc.data();
+                    const sugId = doc.id;
+
+                    const item = document.createElement('div');
+                    item.className = "bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-white text-base">${sug.title}</h4>
+                            <div class="flex gap-2">
+                                <button onclick="acceptSuggestion('${sugId}', '${encodeURIComponent(sug.title)}', '${encodeURIComponent(sug.link || '')}', '${encodeURIComponent(sug.comment || '')}')" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors" title="Als Wunsch übernehmen">
+                                    <i class="fa-solid fa-check mr-1"></i> Akzeptieren
+                                </button>
+                                <button onclick="deleteSuggestion('${sugId}')" class="bg-red-900 hover:bg-red-800 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors" title="Ablehnen">
+                                    <i class="fa-solid fa-xmark mr-1"></i> Ablehnen
+                                </button>
+                            </div>
+                        </div>
+                        ${sug.link ? `<p class="text-xs text-blue-400 truncate"><a href="${sug.link}" target="_blank"><i class="fa-solid fa-link mr-1"></i>${sug.link}</a></p>` : ''}
+                        ${sug.comment ? `<p class="text-xs text-zinc-400"><span class="font-semibold text-zinc-300">Kommentar:</span> ${sug.comment}</p>` : ''}
+                    `;
+                    suggestionsContainer.appendChild(item);
+                });
+            });
+        }
+
+        // Besucher schickt einen Vorschlag ab
+        const suggestionForm = document.getElementById('suggestion-form');
+        suggestionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            db.collection('suggestions').add({
+                title: document.getElementById('sug-title').value,
+                link: document.getElementById('sug-link').value,
+                comment: document.getElementById('sug-comment').value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                suggestionForm.reset();
+                alert('Vorschlag erfolgreich abgeschickt! Danke dir!');
+            }).catch((error) => {
+                console.error("Fehler beim Senden: ", error);
+                alert('Fehler beim Abschicken.');
+            });
+        });
+
+        // Vorschlag akzeptieren (füllt das Formular oben aus und löscht den Vorschlag)
+        window.acceptSuggestion = function(id, title, link, comment) {
+            document.getElementById('new-title').value = decodeURIComponent(title);
+            document.getElementById('new-link').value = decodeURIComponent(link);
+            document.getElementById('new-desc').value = decodeURIComponent(comment);
+            
+            // Zum Formular hochscrollen
+            document.getElementById('add-wish-form').scrollIntoView({ behavior: 'smooth' });
+            
+            // Aus Vorschlägen löschen
+            db.collection('suggestions').doc(id).delete();
+        };
+
+        // Vorschlag ablehnen / löschen
+        window.deleteSuggestion = function(id) {
+            db.collection('suggestions').doc(id).delete();
+        };
+
         // Wunsch löschen
         window.deleteWish = function(event, id) {
             event.preventDefault();
             event.stopPropagation();
-            
             db.collection('wishes').doc(id).delete().catch((error) => {
                 console.error("Fehler beim Löschen: ", error);
                 alert("Fehler beim Löschen des Wunsches.");
@@ -177,7 +282,6 @@
         window.toggleReserve = function(event, id, currentStatus) {
             event.preventDefault();
             event.stopPropagation();
-            
             db.collection('wishes').doc(id).update({
                 reserved: !currentStatus
             });
@@ -187,7 +291,6 @@
         const form = document.getElementById('add-wish-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            
             db.collection('wishes').add({
                 title: document.getElementById('new-title').value,
                 price: parseFloat(document.getElementById('new-price').value),
