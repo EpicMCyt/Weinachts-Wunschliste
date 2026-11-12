@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Wunschliste</title>
+    <title>Wunschlisten Übersicht</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -15,102 +15,152 @@
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 pb-12 relative">
 
-    <!-- Admin-Button oben links -->
-    <button onclick="toggleAdminLogin()" class="absolute top-4 left-4 text-zinc-500 hover:text-zinc-300 p-2 transition-colors z-20">
-        <i class="fa-solid fa-key text-xl"></i>
-    </button>
+    <!-- ========================================== -->
+    <!-- 1. STARTSEITE (AUSWAHL DER WUNSCHLISTE)    -->
+    <!-- ========================================== -->
+    <div id="home-view" class="min-h-screen flex flex-col justify-center items-center px-4">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-3">Wunschlisten</h1>
+            <p class="text-zinc-400 text-sm md:text-base">Wähle eine Wunschliste aus, um sie anzusehen oder zu bearbeiten.</p>
+        </div>
 
-    <!-- verstecktes Passwort-Eingabefeld (Ersatz für prompt mit Sternchen) -->
-    <div id="admin-login-box" class="hidden absolute top-14 left-4 bg-zinc-900 p-3 rounded-xl border border-zinc-700 shadow-xl z-20 flex gap-2">
-        <input type="password" id="admin-password-input" placeholder="Admin Passwort" class="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500">
-        <button onclick="submitAdminLogin()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-sm px-3 py-1.5 rounded-lg font-medium transition-colors">OK</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl w-full">
+            <!-- Karte für Liste 1 (Deine) -->
+            <button onclick="openList('list1')" class="group bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-600 p-8 rounded-2xl shadow-xl text-left transition-all hover:scale-[1.02] flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
+                        <i class="fa-solid fa-gift text-xl text-zinc-200"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Lucas Wunschliste</h2>
+                    <p class="text-zinc-400 text-sm">Meine persönliche Wunschliste & Geschenkideen.</p>
+                </div>
+                <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
+                    Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                </div>
+            </button>
+
+            <!-- Karte für Liste 2 (Andere Liste) -->
+            <button onclick="openList('list2')" class="group bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-600 p-8 rounded-2xl shadow-xl text-left transition-all hover:scale-[1.02] flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
+                        <i class="fa-solid fa-star text-xl text-zinc-200"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Zweite Wunschliste</h2>
+                    <p class="text-zinc-400 text-sm">Separate Wunschliste mit eigenem Admin-Bereich & Vorschlägen.</p>
+                </div>
+                <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
+                    Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                </div>
+            </button>
+        </div>
     </div>
 
-    <!-- Header -->
-    <header class="text-center py-12 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-3">Lucas Wunschliste</h1>
-    </header>
-
-    <!-- Wunsch-Grid -->
-    <main class="max-w-6xl mx-auto px-4 mt-10">
-        <div id="wishlist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Wünsche werden hier in Echtzeit geladen -->
+    <!-- ========================================== -->
+    <!-- 2. WUNSCHLISTEN-ANSICHT (DYNAMISCH)        -->
+    <!-- ========================================== -->
+    <div id="list-view" class="hidden">
+        <!-- Navigation oben links: Zurück + Admin-Schlüssel -->
+        <div class="absolute top-4 left-4 flex items-center gap-2 z-20">
+            <button onclick="goHome()" class="text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5" title="Zurück zur Auswahl">
+                <i class="fa-solid fa-arrow-left"></i> Start
+            </button>
+            <button onclick="toggleAdminLogin()" class="text-zinc-500 hover:text-zinc-300 p-2 transition-colors" title="Admin Login">
+                <i class="fa-solid fa-key text-xl"></i>
+            </button>
         </div>
 
-        <!-- Admin-Bereich (standardmäßig versteckt) -->
-        <div id="admin-section" class="hidden mt-16 space-y-10 max-w-xl mx-auto">
+        <!-- Verstecktes Passwort-Eingabefeld -->
+        <div id="admin-login-box" class="hidden absolute top-16 left-4 bg-zinc-900 p-3 rounded-xl border border-zinc-700 shadow-xl z-20 flex gap-2">
+            <input type="password" id="admin-password-input" placeholder="Admin Passwort" class="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500">
+            <button onclick="submitAdminLogin()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-sm px-3 py-1.5 rounded-lg font-medium transition-colors">OK</button>
+        </div>
 
-            <!-- Wunsch hinzufügen / bearbeiten -->
-            <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 id="form-title" class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
-                    <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
+        <!-- Header -->
+        <header class="text-center py-14 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
+            <h1 id="active-list-title" class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-2">Lucas Wunschliste</h1>
+            <p id="active-list-subtitle" class="text-zinc-400 text-sm">Klicke auf eine Karte, um zum Shop zu gelangen.</p>
+        </header>
+
+        <!-- Wunsch-Grid -->
+        <main class="max-w-6xl mx-auto px-4 mt-10">
+            <div id="wishlist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Wünsche werden hier in Echtzeit geladen -->
+            </div>
+
+            <!-- Admin-Bereich (standardmäßig versteckt) -->
+            <div id="admin-section" class="hidden mt-16 space-y-10 max-w-xl mx-auto">
+
+                <!-- Wunsch hinzufügen / bearbeiten -->
+                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="form-title" class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
+                        <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
+                    </div>
+                    <form id="add-wish-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
+                            <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
+                                <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL</label>
+                                <input type="url" id="new-image" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
+                            <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
+                            <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="submit" id="submit-btn" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
+                                Wunsch speichern
+                            </button>
+                            <button type="button" id="cancel-edit-btn" onclick="resetWishForm()" class="hidden bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700">
+                                Abbrechen
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form id="add-wish-form" class="space-y-4">
+
+                <!-- Eingegangene Vorschläge (Nur im Admin-Modus sichtbar) -->
+                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
+                    <h2 class="text-xl font-semibold text-zinc-200 mb-4"><i class="fa-solid fa-lightbulb mr-2 text-yellow-400"></i> Eingegangene Vorschläge</h2>
+                    <div id="suggestions-container" class="space-y-4">
+                        <p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Vorschlags-Bereich für alle Besucher -->
+            <div class="mt-20 bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800 shadow-xl max-w-xl mx-auto">
+                <h2 class="text-lg font-semibold text-zinc-200 mb-2"><i class="fa-solid fa-comment-dots mr-2"></i> Idee oder Wunsch vorschlagen</h2>
+                <p id="suggestion-subtitle" class="text-zinc-400 text-xs mb-4">Hier kannst du zusätzliche Wunschideen für diese Liste vorschlagen.</p>
+                <form id="suggestion-form" class="space-y-3">
                     <div>
-                        <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
-                        <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
-                            <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL</label>
-                            <input type="url" id="new-image" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
-                        </div>
+                        <input type="text" id="sug-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Idee / Produktname *">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
-                        <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
+                        <input type="url" id="sug-link" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Shop-Link (optional)">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
-                        <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                        <textarea id="sug-comment" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Kommentar / Warum das eine gute Idee ist (optional)"></textarea>
                     </div>
-                    <div class="flex gap-3">
-                        <button type="submit" id="submit-btn" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
-                            Wunsch speichern
-                        </button>
-                        <button type="button" id="cancel-edit-btn" onclick="resetWishForm()" class="hidden bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700">
-                            Abbrechen
-                        </button>
-                    </div>
+                    <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium py-2.5 px-4 rounded-xl text-sm transition-colors shadow">
+                        Vorschlag abschicken
+                    </button>
                 </form>
             </div>
-
-            <!-- Eingegangene Vorschläge (Nur im Admin-Modus sichtbar) -->
-            <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
-                <h2 class="text-xl font-semibold text-zinc-200 mb-4"><i class="fa-solid fa-lightbulb mr-2 text-yellow-400"></i> Eingegangene Vorschläge</h2>
-                <div id="suggestions-container" class="space-y-4">
-                    <!-- Vorschläge werden hier geladen -->
-                    <p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Vorschlags-Bereich für alle Besucher -->
-        <div class="mt-20 bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800 shadow-xl max-w-xl mx-auto">
-            <h2 class="text-lg font-semibold text-zinc-200 mb-2"><i class="fa-solid fa-comment-dots mr-2"></i> Idee oder Wunsch vorschlagen</h2>
-            <p class="text-zinc-400 text-xs mb-4">Hier kannst du zusätzliche Wunsch ideen vorschlagen.</p>
-            <form id="suggestion-form" class="space-y-3">
-                <div>
-                    <input type="text" id="sug-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Idee / Produktname *">
-                </div>
-                <div>
-                    <input type="url" id="sug-link" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Shop-Link (optional)">
-                </div>
-                <div>
-                    <textarea id="sug-comment" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Kommentar / Warum das eine gute Idee ist (optional)"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium py-2.5 px-4 rounded-xl text-sm transition-colors shadow">
-                    Vorschlag abschicken
-                </button>
-            </form>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <script>
         // Firebase Konfiguration
@@ -127,20 +177,91 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // ==========================================
+        // KONFIGURATION DER BEIDEN LISTEN
+        // ==========================================
+        const LISTS_CONFIG = {
+            list1: {
+                title: "Lucas Wunschliste",
+                wishesCollection: "wishes",
+                suggestionsCollection: "suggestions",
+                password: "IamEpicMClol"
+            },
+            list2: {
+                title: "Zweite Wunschliste", // Hier kannst du den Namen der 2. Liste ändern
+                wishesCollection: "wishes_2",
+                suggestionsCollection: "suggestions_2",
+                password: "AdminListe2" // Eigenes Passwort für Liste 2
+            }
+        };
+
+        // Aktiver Zustand
+        let currentListKey = null;
+        let adminState = { list1: false, list2: false }; // Speichert Login-Status getrennt pro Liste
+        let editingWishId = null;
+
+        // Listener-Referenzen zum sauberen Beenden beim Listenwechsel
+        let unsubscribeWishes = null;
+        let unsubscribeSuggestions = null;
+
+        // DOM-Elemente
+        const homeView = document.getElementById('home-view');
+        const listView = document.getElementById('list-view');
         const container = document.getElementById('wishlist-container');
         const adminSection = document.getElementById('admin-section');
         const suggestionsContainer = document.getElementById('suggestions-container');
         const loginBox = document.getElementById('admin-login-box');
         const passwordInput = document.getElementById('admin-password-input');
 
-        // Admin-Status & Bearbeitungs-ID
-        let isAdmin = false;
-        let editingWishId = null;
+        // ==========================================
+        // NAVIGATION: STARTSEITE <-> LISTE
+        // ==========================================
+        window.openList = function(listKey) {
+            currentListKey = listKey;
+            const config = LISTS_CONFIG[listKey];
 
-        // Login-Box ein- / ausblenden
+            // Titel setzen
+            document.getElementById('active-list-title').textContent = config.title;
+
+            // Ansichten umschalten
+            homeView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            loginBox.classList.add('hidden');
+            passwordInput.value = '';
+            resetWishForm();
+
+            // Prüfen, ob für DIESE Liste bereits Admin eingeloggt ist
+            if (adminState[listKey]) {
+                adminSection.classList.remove('hidden');
+                loadSuggestions();
+            } else {
+                adminSection.classList.add('hidden');
+                if (unsubscribeSuggestions) unsubscribeSuggestions();
+            }
+
+            // Wünsche der gewählten Liste laden
+            loadWishlist();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.goHome = function() {
+            // Echtzeit-Listener stoppen
+            if (unsubscribeWishes) unsubscribeWishes();
+            if (unsubscribeSuggestions) unsubscribeSuggestions();
+
+            currentListKey = null;
+            loginBox.classList.add('hidden');
+            listView.classList.add('hidden');
+            homeView.classList.remove('hidden');
+        };
+
+        // ==========================================
+        // ADMIN LOGIN (PRO LISTE GETRENNT)
+        // ==========================================
         window.toggleAdminLogin = function() {
-            if (isAdmin) {
-                alert("Admin-Modus ist bereits aktiv!");
+            if (!currentListKey) return;
+            if (adminState[currentListKey]) {
+                alert("Admin-Modus für diese Liste ist bereits aktiv!");
                 return;
             }
             loginBox.classList.toggle('hidden');
@@ -149,11 +270,13 @@
             }
         };
 
-        // Passwort prüfen ("IamEpicMClol")
         window.submitAdminLogin = function() {
+            if (!currentListKey) return;
+            const config = LISTS_CONFIG[currentListKey];
             const enteredPassword = passwordInput.value;
-            if (enteredPassword === "IamEpicMClol") {
-                isAdmin = true;
+
+            if (enteredPassword === config.password) {
+                adminState[currentListKey] = true;
                 loginBox.classList.add('hidden');
                 passwordInput.value = '';
                 adminSection.classList.remove('hidden');
@@ -161,25 +284,30 @@
                 loadWishlist();
                 loadSuggestions();
             } else {
-                alert("Falsches Passwort!");
+                alert("Falsches Passwort für diese Liste!");
                 passwordInput.value = '';
             }
         };
 
-        // Enter-Taste im Passwortfeld unterstützen
         passwordInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 submitAdminLogin();
             }
         });
 
-        // Wünsche in Echtzeit laden
+        // ==========================================
+        // WÜNSCHE LADEN & VERWALTEN
+        // ==========================================
         function loadWishlist() {
-            db.collection('wishes').onSnapshot((snapshot) => {
+            if (unsubscribeWishes) unsubscribeWishes();
+            const config = LISTS_CONFIG[currentListKey];
+            const isAdmin = adminState[currentListKey];
+
+            unsubscribeWishes = db.collection(config.wishesCollection).onSnapshot((snapshot) => {
                 container.innerHTML = '';
 
                 if (snapshot.empty) {
-                    container.innerHTML = '<p class="col-span-full text-center text-zinc-400 py-8">Noch keine Wünsche vorhanden.</p>';
+                    container.innerHTML = '<p class="col-span-full text-center text-zinc-400 py-8">Noch keine Wünsche in dieser Liste vorhanden.</p>';
                     return;
                 }
 
@@ -195,7 +323,6 @@
                     card.rel = "noopener noreferrer";
                     card.className = `block bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-xl flex flex-col justify-between transition-all ${isReserved ? 'opacity-60' : 'hover:scale-[1.02] hover:border-zinc-600'}`;
 
-                    // Admin-Buttons oben rechts (Stift & Mülleimer)
                     const adminButtonsHtml = isAdmin ? `
                         <div class="absolute top-3 right-3 flex gap-2 z-10">
                             <button onclick="editWish(event, '${id}', '${encodeURIComponent(wish.title)}', ${wish.price}, '${encodeURIComponent(wish.image)}', '${encodeURIComponent(wish.link)}', '${encodeURIComponent(commentText)}')" class="bg-blue-600 hover:bg-blue-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors" title="Wunsch bearbeiten">
@@ -235,12 +362,14 @@
             });
         }
 
-        // Initiales Laden
-        loadWishlist();
-
-        // Vorschläge in Echtzeit laden (nur für Admin)
+        // ==========================================
+        // VORSCHLÄGE LADEN & VERWALTEN (PRO LISTE)
+        // ==========================================
         function loadSuggestions() {
-            db.collection('suggestions').onSnapshot((snapshot) => {
+            if (unsubscribeSuggestions) unsubscribeSuggestions();
+            const config = LISTS_CONFIG[currentListKey];
+
+            unsubscribeSuggestions = db.collection(config.suggestionsCollection).onSnapshot((snapshot) => {
                 suggestionsContainer.innerHTML = '';
 
                 if (snapshot.empty) {
@@ -274,11 +403,14 @@
             });
         }
 
-        // Besucher schickt einen Vorschlag ab
+        // Besucher schickt einen Vorschlag für die aktive Liste ab
         const suggestionForm = document.getElementById('suggestion-form');
         suggestionForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            db.collection('suggestions').add({
+            if (!currentListKey) return;
+            const config = LISTS_CONFIG[currentListKey];
+
+            db.collection(config.suggestionsCollection).add({
                 title: document.getElementById('sug-title').value,
                 link: document.getElementById('sug-link').value,
                 comment: document.getElementById('sug-comment').value,
@@ -292,23 +424,22 @@
             });
         });
 
-        // Vorschlag akzeptieren
         window.acceptSuggestion = function(id, title, link, comment) {
+            const config = LISTS_CONFIG[currentListKey];
             resetWishForm();
             document.getElementById('new-title').value = decodeURIComponent(title);
             document.getElementById('new-link').value = decodeURIComponent(link);
             document.getElementById('new-desc').value = decodeURIComponent(comment);
 
             document.getElementById('add-wish-form').scrollIntoView({ behavior: 'smooth' });
-            db.collection('suggestions').doc(id).delete();
+            db.collection(config.suggestionsCollection).doc(id).delete();
         };
 
-        // Vorschlag ablehnen / löschen
         window.deleteSuggestion = function(id) {
-            db.collection('suggestions').doc(id).delete();
+            const config = LISTS_CONFIG[currentListKey];
+            db.collection(config.suggestionsCollection).doc(id).delete();
         };
 
-        // Wunsch bearbeiten (Daten ins Formular laden)
         window.editWish = function(event, id, title, price, image, link, desc) {
             event.preventDefault();
             event.stopPropagation();
@@ -327,7 +458,6 @@
             document.getElementById('add-wish-form').scrollIntoView({ behavior: 'smooth' });
         };
 
-        // Formular nach dem Bearbeiten/Abbrechen zurücksetzen
         window.resetWishForm = function() {
             editingWishId = null;
             document.getElementById('add-wish-form').reset();
@@ -336,21 +466,21 @@
             document.getElementById('cancel-edit-btn').classList.add('hidden');
         };
 
-        // Wunsch löschen
         window.deleteWish = function(event, id) {
             event.preventDefault();
             event.stopPropagation();
-            db.collection('wishes').doc(id).delete().catch((error) => {
+            const config = LISTS_CONFIG[currentListKey];
+            db.collection(config.wishesCollection).doc(id).delete().catch((error) => {
                 console.error("Fehler beim Löschen: ", error);
                 alert("Fehler beim Löschen des Wunsches.");
             });
         };
 
-        // Reservierungsstatus umschalten
         window.toggleReserve = function(event, id, currentStatus) {
             event.preventDefault();
             event.stopPropagation();
-            db.collection('wishes').doc(id).update({
+            const config = LISTS_CONFIG[currentListKey];
+            db.collection(config.wishesCollection).doc(id).update({
                 reserved: !currentStatus
             });
         };
@@ -359,6 +489,8 @@
         const form = document.getElementById('add-wish-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            if (!currentListKey) return;
+            const config = LISTS_CONFIG[currentListKey];
 
             const wishData = {
                 title: document.getElementById('new-title').value,
@@ -369,8 +501,7 @@
             };
 
             if (editingWishId) {
-                // Bearbeiten
-                db.collection('wishes').doc(editingWishId).update(wishData).then(() => {
+                db.collection(config.wishesCollection).doc(editingWishId).update(wishData).then(() => {
                     resetWishForm();
                     alert('Wunsch erfolgreich aktualisiert!');
                 }).catch((error) => {
@@ -378,9 +509,8 @@
                     alert('Fehler beim Aktualisieren.');
                 });
             } else {
-                // Neu erstellen
                 wishData.reserved = false;
-                db.collection('wishes').add(wishData).then(() => {
+                db.collection(config.wishesCollection).add(wishData).then(() => {
                     resetWishForm();
                     alert('Wunsch erfolgreich hinzugefügt!');
                 }).catch((error) => {
