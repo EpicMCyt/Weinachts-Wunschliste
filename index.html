@@ -16,9 +16,15 @@
 <body class="min-h-screen bg-zinc-950 text-zinc-100 pb-12 relative">
 
     <!-- Admin-Button oben links -->
-    <button onclick="loginAdmin()" class="absolute top-4 left-4 text-zinc-500 hover:text-zinc-300 p-2 transition-colors">
+    <button onclick="toggleAdminLogin()" class="absolute top-4 left-4 text-zinc-500 hover:text-zinc-300 p-2 transition-colors z-20">
         <i class="fa-solid fa-key text-xl"></i>
     </button>
+
+    <!-- verstecktes Passwort-Eingabefeld (Ersatz für prompt mit Sternchen) -->
+    <div id="admin-login-box" class="hidden absolute top-14 left-4 bg-zinc-900 p-3 rounded-xl border border-zinc-700 shadow-xl z-20 flex gap-2">
+        <input type="password" id="admin-password-input" placeholder="Admin Passwort" class="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500">
+        <button onclick="submitAdminLogin()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-sm px-3 py-1.5 rounded-lg font-medium transition-colors">OK</button>
+    </div>
 
     <!-- Header -->
     <header class="text-center py-12 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
@@ -124,24 +130,48 @@
         const container = document.getElementById('wishlist-container');
         const adminSection = document.getElementById('admin-section');
         const suggestionsContainer = document.getElementById('suggestions-container');
+        const loginBox = document.getElementById('admin-login-box');
+        const passwordInput = document.getElementById('admin-password-input');
 
         // Admin-Status & Bearbeitungs-ID
         let isAdmin = false;
         let editingWishId = null;
 
-        // Admin Login mit Code "Epicmc"
-        window.loginAdmin = function() {
-            const code = prompt("Admin Code eingeben:");
-            if (code === "Epicmc") {
+        // Login-Box ein- / ausblenden
+        window.toggleAdminLogin = function() {
+            if (isAdmin) {
+                alert("Admin-Modus ist bereits aktiv!");
+                return;
+            }
+            loginBox.classList.toggle('hidden');
+            if (!loginBox.classList.contains('hidden')) {
+                passwordInput.focus();
+            }
+        };
+
+        // Passwort prüfen ("IamEpicMClol")
+        window.submitAdminLogin = function() {
+            const enteredPassword = passwordInput.value;
+            if (enteredPassword === "IamEpicMClol") {
                 isAdmin = true;
+                loginBox.classList.add('hidden');
+                passwordInput.value = '';
                 adminSection.classList.remove('hidden');
                 adminSection.scrollIntoView({ behavior: 'smooth' });
                 loadWishlist();
                 loadSuggestions();
-            } else if (code !== null) {
-                alert("Falscher Code!");
+            } else {
+                alert("Falsches Passwort!");
+                passwordInput.value = '';
             }
         };
+
+        // Enter-Taste im Passwortfeld unterstützen
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAdminLogin();
+            }
+        });
 
         // Wünsche in Echtzeit laden
         function loadWishlist() {
