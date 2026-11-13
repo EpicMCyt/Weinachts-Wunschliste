@@ -1,4 +1,4 @@
-8<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -21,7 +21,7 @@
     <div id="home-view" class="min-h-screen flex flex-col justify-center items-center px-4">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-3">Wunschlisten</h1>
-            <p class="text-zinc-400 text-sm md:text-base">Wähle eine Wunschliste aus.</p>
+            <p class="text-zinc-400 text-sm md:text-base">Wähle eine Wunschliste aus, um sie anzusehen oder zu bearbeiten.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl w-full">
@@ -32,6 +32,7 @@
                         <i class="fa-solid fa-gift text-xl text-zinc-200"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-white mb-2">Lucas Wunschliste</h2>
+                    <p class="text-zinc-400 text-sm">Meine persönliche Wunschliste & Geschenkideen.</p>
                 </div>
                 <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
                     Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
@@ -44,7 +45,8 @@
                     <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
                         <i class="fa-solid fa-star text-xl text-zinc-200"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Isabelles Wunschliste</h2>
+                    <h2 class="text-2xl font-bold text-white mb-2">Zweite Wunschliste</h2>
+                    <p class="text-zinc-400 text-sm">Separate Wunschliste mit eigenem Admin-Bereich & Vorschlägen.</p>
                 </div>
                 <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
                     Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
@@ -76,6 +78,7 @@
         <!-- Header -->
         <header class="text-center py-14 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
             <h1 id="active-list-title" class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-2">Lucas Wunschliste</h1>
+            <p id="active-list-subtitle" class="text-zinc-400 text-sm">Klicke auf eine Karte, um zum Shop zu gelangen.</p>
         </header>
 
         <!-- Wunsch-Grid -->
@@ -91,7 +94,7 @@
                 <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
                     <div class="flex justify-between items-center mb-4">
                         <h2 id="form-title" class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
-                        <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Bearbeiten Aktiv</span>
+                        <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
                     </div>
                     <form id="add-wish-form" class="space-y-4">
                         <div>
@@ -104,8 +107,8 @@
                                 <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL</label>
-                                <input type="url" id="new-image" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL (optional)</label>
+                                <input type="url" id="new-image" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
                             </div>
                         </div>
                         <div>
@@ -185,23 +188,21 @@
                 password: "IamEpicMClol"
             },
             list2: {
-                title: "Zweite Wunschliste", // Hier kannst du den Namen der 2. Liste ändern
+                title: "Zweite Wunschliste",
                 wishesCollection: "wishes_2",
                 suggestionsCollection: "suggestions_2",
-                password: "Luna" // Eigenes Passwort für Liste 2
+                password: "AdminListe2"
             }
         };
 
         // Aktiver Zustand
         let currentListKey = null;
-        let adminState = { list1: false, list2: false }; // Speichert Login-Status getrennt pro Liste
+        let adminState = { list1: false, list2: false };
         let editingWishId = null;
 
-        // Listener-Referenzen zum sauberen Beenden beim Listenwechsel
         let unsubscribeWishes = null;
         let unsubscribeSuggestions = null;
 
-        // DOM-Elemente
         const homeView = document.getElementById('home-view');
         const listView = document.getElementById('list-view');
         const container = document.getElementById('wishlist-container');
@@ -217,17 +218,14 @@
             currentListKey = listKey;
             const config = LISTS_CONFIG[listKey];
 
-            // Titel setzen
             document.getElementById('active-list-title').textContent = config.title;
 
-            // Ansichten umschalten
             homeView.classList.add('hidden');
             listView.classList.remove('hidden');
             loginBox.classList.add('hidden');
             passwordInput.value = '';
             resetWishForm();
 
-            // Prüfen, ob für DIESE Liste bereits Admin eingeloggt ist
             if (adminState[listKey]) {
                 adminSection.classList.remove('hidden');
                 loadSuggestions();
@@ -236,13 +234,11 @@
                 if (unsubscribeSuggestions) unsubscribeSuggestions();
             }
 
-            // Wünsche der gewählten Liste laden
             loadWishlist();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.goHome = function() {
-            // Echtzeit-Listener stoppen
             if (unsubscribeWishes) unsubscribeWishes();
             if (unsubscribeSuggestions) unsubscribeSuggestions();
 
@@ -322,7 +318,7 @@
 
                     const adminButtonsHtml = isAdmin ? `
                         <div class="absolute top-3 right-3 flex gap-2 z-10">
-                            <button onclick="editWish(event, '${id}', '${encodeURIComponent(wish.title)}', ${wish.price}, '${encodeURIComponent(wish.image)}', '${encodeURIComponent(wish.link)}', '${encodeURIComponent(commentText)}')" class="bg-blue-600 hover:bg-blue-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors" title="Wunsch bearbeiten">
+                            <button onclick="editWish(event, '${id}', '${encodeURIComponent(wish.title)}', ${wish.price}, '${encodeURIComponent(wish.image || '')}', '${encodeURIComponent(wish.link)}', '${encodeURIComponent(commentText)}')" class="bg-blue-600 hover:bg-blue-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors" title="Wunsch bearbeiten">
                                 <i class="fa-solid fa-pen text-xs"></i>
                             </button>
                             <button onclick="deleteWish(event, '${id}')" class="bg-red-600 hover:bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-colors" title="Wunsch löschen">
@@ -333,10 +329,15 @@
                     const reservedBadgeHtml = isReserved ? `
                         <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-zinc-950 text-zinc-300 text-xs px-3 py-1 rounded-full font-bold border border-zinc-700">Reserviert</span>` : '';
 
+                    // Bild- oder Platzhalter-Anzeige (Bilder sind jetzt optional)
+                    const imageContent = wish.image 
+                        ? `<img src="${wish.image}" alt="${wish.title}" class="max-h-full max-w-full object-contain">`
+                        : `<div class="flex flex-col items-center justify-center text-zinc-600"><i class="fa-solid fa-gift text-4xl mb-1"></i><span class="text-xs text-zinc-500">Kein Bild</span></div>`;
+
                     card.innerHTML = `
                         <div>
                             <div class="h-52 w-full overflow-hidden relative bg-zinc-950 flex items-center justify-center p-3">
-                                <img src="${wish.image}" alt="${wish.title}" class="max-h-full max-w-full object-contain">
+                                ${imageContent}
                                 ${reservedBadgeHtml}
                                 ${adminButtonsHtml}
                             </div>
@@ -400,7 +401,6 @@
             });
         }
 
-        // Besucher schickt einen Vorschlag für die aktive Liste ab
         const suggestionForm = document.getElementById('suggestion-form');
         suggestionForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -444,7 +444,7 @@
             editingWishId = id;
             document.getElementById('new-title').value = decodeURIComponent(title);
             document.getElementById('new-price').value = price;
-            document.getElementById('new-image').value = decodeURIComponent(image);
+            document.getElementById('new-image').value = decodeURIComponent(image) !== 'undefined' ? decodeURIComponent(image) : '';
             document.getElementById('new-link').value = decodeURIComponent(link);
             document.getElementById('new-desc').value = decodeURIComponent(desc);
 
@@ -482,7 +482,6 @@
             });
         };
 
-        // Neuen Wunsch hinzufügen oder bestehenden aktualisieren
         const form = document.getElementById('add-wish-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -492,7 +491,7 @@
             const wishData = {
                 title: document.getElementById('new-title').value,
                 price: parseFloat(document.getElementById('new-price').value),
-                image: document.getElementById('new-image').value,
+                image: document.getElementById('new-image').value.trim(),
                 link: document.getElementById('new-link').value,
                 description: document.getElementById('new-desc').value
             };
