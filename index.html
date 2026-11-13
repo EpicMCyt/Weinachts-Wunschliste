@@ -76,7 +76,7 @@
         <!-- Header -->
         <header class="text-center py-14 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
             <h1 id="active-list-title" class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-2">Lucas Wunschliste</h1>
-            <p id="active-list-subtitle" class="text-zinc-400 text-sm">Klicke auf eine Karte, um zum Shop zu gelangen.</p>
+            <p id="active-list-subtitle" class="text-zinc-400 text-sm max-w-xl mx-auto px-4">Dieses Jahr lasse ich mich überraschen, da ihr selbst entscheiden könnt was ihr mir zu Weinachten schenkt</p>
         </header>
 
         <!-- Wunsch-Grid -->
@@ -181,12 +181,14 @@
         const LISTS_CONFIG = {
             list1: {
                 title: "Lucas Wunschliste",
+                subtitle: "Dieses Jahr lasse ich mich überraschen, da ihr selbst entscheiden könnt was ihr mir zu Weinachten schenkt",
                 wishesCollection: "wishes",
                 suggestionsCollection: "suggestions",
                 password: "IamEpicMClol"
             },
             list2: {
-                title: "Zweite Wunschliste",
+                title: "Isabelles Wunschliste",
+                subtitle: "Hier findet ihr Isabelles Wunschliste.",
                 wishesCollection: "wishes_2",
                 suggestionsCollection: "suggestions_2",
                 password: "Luna"
@@ -217,6 +219,7 @@
             const config = LISTS_CONFIG[listKey];
 
             document.getElementById('active-list-title').textContent = config.title;
+            document.getElementById('active-list-subtitle').textContent = config.subtitle;
 
             homeView.classList.add('hidden');
             listView.classList.remove('hidden');
@@ -327,7 +330,6 @@
                     const reservedBadgeHtml = isReserved ? `
                         <span class="absolute top-3 ${isAdmin ? 'left-3' : 'right-3'} bg-zinc-950 text-zinc-300 text-xs px-3 py-1 rounded-full font-bold border border-zinc-700">Reserviert</span>` : '';
 
-                    // Bild- oder Platzhalter-Anzeige (Bilder sind jetzt optional)
                     const imageContent = wish.image 
                         ? `<img src="${wish.image}" alt="${wish.title}" class="max-h-full max-w-full object-contain">`
                         : `<div class="flex flex-col items-center justify-center text-zinc-600"><i class="fa-solid fa-gift text-4xl mb-1"></i><span class="text-xs text-zinc-500">Kein Bild</span></div>`;
