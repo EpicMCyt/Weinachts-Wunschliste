@@ -13,152 +13,203 @@
     <!-- Firebase Firestore (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="min-h-screen bg-zinc-950 text-zinc-100 pb-12 relative">
+<body class="min-h-screen bg-zinc-950 text-zinc-100 pb-12 relative flex flex-col justify-between">
 
-    <!-- ========================================== -->
-    <!-- 1. STARTSEITE (AUSWAHL DER WUNSCHLISTE)    -->
-    <!-- ========================================== -->
-    <div id="home-view" class="min-h-screen flex flex-col justify-center items-center px-4">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-3">Wunschlisten</h1>
-            <p class="text-zinc-400 text-sm md:text-base">Wähle eine Wunschliste aus, um sie anzusehen oder zu bearbeiten.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl w-full">
-            <!-- Karte für Liste 1 (Deine) -->
-            <button onclick="openList('list1')" class="group bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-600 p-8 rounded-2xl shadow-xl text-left transition-all hover:scale-[1.02] flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
-                        <i class="fa-solid fa-gift text-xl text-zinc-200"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Lucas Wunschliste</h2>
-                </div>
-                <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
-                    Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
-                </div>
-            </button>
-
-            <!-- Karte für Liste 2 (Andere Liste) -->
-            <button onclick="openList('list2')" class="group bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-600 p-8 rounded-2xl shadow-xl text-left transition-all hover:scale-[1.02] flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
-                        <i class="fa-solid fa-star text-xl text-zinc-200"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white mb-2">Isabelles Wunschliste</h2>
-                </div>
-                <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
-                    Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
-                </div>
-            </button>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 2. WUNSCHLISTEN-ANSICHT (DYNAMISCH)        -->
-    <!-- ========================================== -->
-    <div id="list-view" class="hidden">
-        <!-- Navigation oben links: Zurück + Admin-Schlüssel -->
-        <div class="absolute top-4 left-4 flex items-center gap-2 z-20">
-            <button onclick="goHome()" class="text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5" title="Zurück zur Auswahl">
-                <i class="fa-solid fa-arrow-left"></i> Start
-            </button>
-            <button onclick="handleKeyClick()" class="text-zinc-500 hover:text-zinc-300 p-2 transition-colors" title="Admin Login">
-                <i class="fa-solid fa-key text-xl"></i>
-            </button>
-        </div>
-
-        <!-- Verstecktes Passwort-Eingabefeld -->
-        <div id="admin-login-box" class="hidden absolute top-16 left-4 bg-zinc-900 p-3 rounded-xl border border-zinc-700 shadow-xl z-20 flex gap-2">
-            <input type="password" id="admin-password-input" placeholder="Admin Passwort" class="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500">
-            <button onclick="submitAdminLogin()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-sm px-3 py-1.5 rounded-lg font-medium transition-colors">OK</button>
-        </div>
-
-        <!-- Header -->
-        <header class="text-center py-14 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
-            <h1 id="active-list-title" class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-2">Lucas Wunschliste</h1>
-            <p id="active-list-subtitle" class="text-zinc-400 text-sm max-w-xl mx-auto px-4">Dieses Jahr lasse ich mich überraschen, da ihr selbst entscheiden könnt was ihr mir zu Weinachten schenkt</p>
-        </header>
-
-        <!-- Wunsch-Grid -->
-        <main class="max-w-6xl mx-auto px-4 mt-10">
-            <div id="wishlist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Wünsche werden hier in Echtzeit geladen -->
+    <div>
+        <!-- ========================================== -->
+        <!-- 1. STARTSEITE (AUSWAHL DER WUNSCHLISTE)    -->
+        <!-- ========================================== -->
+        <div id="home-view" class="min-h-screen flex flex-col justify-center items-center px-4">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-3">Wunschlisten</h1>
+                <p class="text-zinc-400 text-sm md:text-base">Wähle eine Wunschliste aus, um sie anzusehen oder zu bearbeiten.</p>
             </div>
 
-            <!-- Admin-Bereich (standardmäßig versteckt) -->
-            <div id="admin-section" class="hidden mt-16 space-y-10 max-w-xl mx-auto">
-
-                <!-- Wunsch hinzufügen / bearbeiten -->
-                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 id="form-title" class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
-                        <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl w-full">
+                <!-- Karte für Liste 1 (Deine) -->
+                <button onclick="openList('list1')" class="group bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-600 p-8 rounded-2xl shadow-xl text-left transition-all hover:scale-[1.02] flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
+                            <i class="fa-solid fa-gift text-xl text-zinc-200"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Lucas Wunschliste</h2>
                     </div>
-                    <form id="add-wish-form" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
-                            <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
+                    <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
+                        Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                    </div>
+                </button>
+
+                <!-- Karte für Liste 2 (Andere Liste) -->
+                <button onclick="openList('list2')" class="group bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-600 p-8 rounded-2xl shadow-xl text-left transition-all hover:scale-[1.02] flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-zinc-800 group-hover:bg-zinc-700 rounded-xl flex items-center justify-center mb-6 transition-colors border border-zinc-700">
+                            <i class="fa-solid fa-star text-xl text-zinc-200"></i>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <h2 class="text-2xl font-bold text-white mb-2">Isabelles Wunschliste</h2>
+                    </div>
+                    <div class="mt-8 flex items-center text-sm font-semibold text-zinc-300 group-hover:text-white">
+                        Liste öffnen <i class="fa-solid fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 2. WUNSCHLISTEN-ANSICHT (DYNAMISCH)        -->
+        <!-- ========================================== -->
+        <div id="list-view" class="hidden">
+            <!-- Navigation oben links: Zurück + Admin-Schlüssel -->
+            <div class="absolute top-4 left-4 flex items-center gap-2 z-20">
+                <button onclick="goHome()" class="text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5" title="Zurück zur Auswahl">
+                    <i class="fa-solid fa-arrow-left"></i> Start
+                </button>
+                <button onclick="handleKeyClick()" class="text-zinc-500 hover:text-zinc-300 p-2 transition-colors" title="Admin Login">
+                    <i class="fa-solid fa-key text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Verstecktes Passwort-Eingabefeld -->
+            <div id="admin-login-box" class="hidden absolute top-16 left-4 bg-zinc-900 p-3 rounded-xl border border-zinc-700 shadow-xl z-20 flex gap-2">
+                <input type="password" id="admin-password-input" placeholder="Admin Passwort" class="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500">
+                <button onclick="submitAdminLogin()" class="bg-zinc-700 hover:bg-zinc-600 text-white text-sm px-3 py-1.5 rounded-lg font-medium transition-colors">OK</button>
+            </div>
+
+            <!-- Header -->
+            <header class="text-center py-14 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
+                <h1 id="active-list-title" class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-2">Lucas Wunschliste</h1>
+                <p id="active-list-subtitle" class="text-zinc-400 text-sm max-w-xl mx-auto px-4">Dieses Jahr lasse ich mich überraschen, da ihr selbst entscheiden könnt was ihr mir zu Weinachten schenkt</p>
+            </header>
+
+            <!-- Wunsch-Grid -->
+            <main class="max-w-6xl mx-auto px-4 mt-10">
+                <div id="wishlist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Wünsche werden hier in Echtzeit geladen -->
+                </div>
+
+                <!-- Admin-Bereich (standardmäßig versteckt) -->
+                <div id="admin-section" class="hidden mt-16 space-y-10 max-w-xl mx-auto">
+
+                    <!-- Wunsch hinzufügen / bearbeiten -->
+                    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 id="form-title" class="text-xl font-semibold text-zinc-200"><i class="fa-solid fa-plus-circle mr-2"></i> Neuen Wunsch hinzufügen</h2>
+                            <span class="text-xs bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-1 rounded">Admin Aktiv</span>
+                        </div>
+                        <form id="add-wish-form" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
-                                <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Produktname</label>
+                                <input type="text" id="new-title" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Nintendo Switch">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-zinc-300 mb-1">Preis (€)</label>
+                                    <input type="number" step="0.01" id="new-price" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="49.99">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL (optional)</label>
+                                    <input type="url" id="new-image" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-zinc-300 mb-1">Bild-URL (optional)</label>
-                                <input type="url" id="new-image" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://...">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
+                                <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
+                                <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="submit" id="submit-btn" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
+                                    Wunsch speichern
+                                </button>
+                                <button type="button" id="cancel-edit-btn" onclick="resetWishForm()" class="hidden bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700">
+                                    Abbrechen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Eingegangene Vorschläge (Nur im Admin-Modus sichtbar) -->
+                    <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
+                        <h2 class="text-xl font-semibold text-zinc-200 mb-4"><i class="fa-solid fa-lightbulb mr-2 text-yellow-400"></i> Eingegangene Vorschläge</h2>
+                        <div id="suggestions-container" class="space-y-4">
+                            <p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Vorschlags-Bereich für alle Besucher -->
+                <div class="mt-20 bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800 shadow-xl max-w-xl mx-auto">
+                    <h2 class="text-lg font-semibold text-zinc-200 mb-2"><i class="fa-solid fa-comment-dots mr-2"></i> Idee oder Wunsch vorschlagen</h2>
+                    <p id="suggestion-subtitle" class="text-zinc-400 text-xs mb-4">Hier kannst du zusätzliche Wunschideen für diese Liste vorschlagen.</p>
+                    <form id="suggestion-form" class="space-y-3">
+                        <div>
+                            <input type="text" id="sug-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Idee / Produktname *">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-zinc-300 mb-1">Shop-Link</label>
-                            <input type="url" id="new-link" required class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="https://amazon.de/...">
+                            <input type="url" id="sug-link" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Shop-Link (optional)">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-zinc-300 mb-1">Kommentar</label>
-                            <textarea id="new-desc" rows="2" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-zinc-500" placeholder="z.B. Farbe, Größe, Notizen..."></textarea>
+                            <textarea id="sug-comment" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Kommentar / Warum das eine gute Idee ist (optional)"></textarea>
                         </div>
-                        <div class="flex gap-3">
-                            <button type="submit" id="submit-btn" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-lg">
-                                Wunsch speichern
-                            </button>
-                            <button type="button" id="cancel-edit-btn" onclick="resetWishForm()" class="hidden bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium py-3 px-4 rounded-xl transition-colors border border-zinc-700">
-                                Abbrechen
-                            </button>
-                        </div>
+                        <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium py-2.5 px-4 rounded-xl text-sm transition-colors shadow">
+                            Vorschlag abschicken
+                        </button>
                     </form>
                 </div>
+            </main>
+        </div>
 
-                <!-- Eingegangene Vorschläge (Nur im Admin-Modus sichtbar) -->
-                <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 shadow-xl">
-                    <h2 class="text-xl font-semibold text-zinc-200 mb-4"><i class="fa-solid fa-lightbulb mr-2 text-yellow-400"></i> Eingegangene Vorschläge</h2>
-                    <div id="suggestions-container" class="space-y-4">
-                        <p class="text-zinc-500 text-sm">Keine Vorschläge vorhanden.</p>
-                    </div>
-                </div>
-
+        <!-- ========================================== -->
+        <!-- 3. IMPRESSUM-ANSICHT (2. SEITE)            -->
+        <!-- ========================================== -->
+        <div id="impressum-view" class="hidden min-h-screen">
+            <!-- Navigation oben links: Zurück zur Startseite -->
+            <div class="absolute top-4 left-4 flex items-center gap-2 z-20">
+                <button onclick="goHome()" class="text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-1.5" title="Zurück zur Startseite">
+                    <i class="fa-solid fa-arrow-left"></i> Start
+                </button>
             </div>
 
-            <!-- Vorschlags-Bereich für alle Besucher -->
-            <div class="mt-20 bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800 shadow-xl max-w-xl mx-auto">
-                <h2 class="text-lg font-semibold text-zinc-200 mb-2"><i class="fa-solid fa-comment-dots mr-2"></i> Idee oder Wunsch vorschlagen</h2>
-                <p id="suggestion-subtitle" class="text-zinc-400 text-xs mb-4">Hier kannst du zusätzliche Wunschideen für diese Liste vorschlagen.</p>
-                <form id="suggestion-form" class="space-y-3">
-                    <div>
-                        <input type="text" id="sug-title" required class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Idee / Produktname *">
-                    </div>
-                    <div>
-                        <input type="url" id="sug-link" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Shop-Link (optional)">
-                    </div>
-                    <div>
-                        <textarea id="sug-comment" rows="2" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zinc-600" placeholder="Kommentar / Warum das eine gute Idee ist (optional)"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium py-2.5 px-4 rounded-xl text-sm transition-colors shadow">
-                        Vorschlag abschicken
-                    </button>
-                </form>
-            </div>
-        </main>
+            <!-- Header -->
+            <header class="text-center py-14 px-4 bg-zinc-900 border-b border-zinc-800 shadow-xl">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-zinc-100 tracking-wide mb-2">Impressum & Rechtliches</h1>
+                <p class="text-zinc-400 text-sm">Betreiberinformationen & System-Details</p>
+            </header>
+
+            <!-- Inhalt -->
+            <main class="max-w-3xl mx-auto px-4 mt-10 space-y-6 text-zinc-300 text-sm leading-relaxed">
+                <section class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3 shadow-xl">
+                    <h2 class="text-lg font-bold text-white border-b border-zinc-800 pb-2">Angaben gemäß § 5 TMG / Betreiber</h2>
+                    <p><strong>Name / Pseudonym:</strong> [Dein Name hier einfügen]</p>
+                    <p><strong>Kontakt:</strong> [E-Mail-Adresse hier einfügen]</p>
+                    <p><strong>Anschrift:</strong> [Straße, Hausnummer, PLZ Ort hier einfügen]</p>
+                </section>
+
+                <section class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3 shadow-xl">
+                    <h2 class="text-lg font-bold text-white border-b border-zinc-800 pb-2">Haftungsausschluss (Disclaimer)</h2>
+                    <p>[Hier deinen Text für den Haftungsausschluss einfügen... z.B. Haftung für Inhalte, Links etc.]</p>
+                </section>
+
+                <section class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3 shadow-xl">
+                    <h2 class="text-lg font-bold text-white border-b border-zinc-800 pb-2">Urheberrecht & Architektur</h2>
+                    <p>[Hier Angaben zum Urheberrecht einfügen...]</p>
+                    <p class="text-xs text-zinc-500 pt-2 border-t border-zinc-800">
+                        Website-Architektur & Entwicklung: Lucajm1307 (EpicMC)
+                    </p>
+                </section>
+            </main>
+        </div>
     </div>
+
+    <!-- Dezenter Footer auf der Startseite -->
+    <footer class="w-full text-center py-6 text-xs text-zinc-600 mt-12 space-y-1">
+        <div>Impressum</div>
+        <div>
+            <button onclick="openImpressum()" class="hover:text-zinc-400 transition-colors underline underline-offset-4">Website by Lucajm1307</button>
+        </div>
+    </footer>
 
     <!-- ========================================== -->
     <!-- EASTER EGG: FLAPPY BIRD MODAL              -->
@@ -234,6 +285,7 @@
 
         const homeView = document.getElementById('home-view');
         const listView = document.getElementById('list-view');
+        const impressumView = document.getElementById('impressum-view');
         const container = document.getElementById('wishlist-container');
         const adminSection = document.getElementById('admin-section');
         const suggestionsContainer = document.getElementById('suggestions-container');
@@ -241,7 +293,59 @@
         const passwordInput = document.getElementById('admin-password-input');
 
         // ==========================================
-        // EASTER EGG: 10-KICK TRIGGER & FLAPPY BIRD
+        // SEITEN-NAVIGATION (START / LISTE / IMPRESSUM)
+        // ==========================================
+        window.openList = function(listKey) {
+            currentListKey = listKey;
+            const config = LISTS_CONFIG[listKey];
+
+            document.getElementById('active-list-title').textContent = config.title;
+            document.getElementById('active-list-subtitle').textContent = config.subtitle;
+
+            homeView.classList.add('hidden');
+            impressumView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            loginBox.classList.add('hidden');
+            passwordInput.value = '';
+            resetWishForm();
+
+            if (adminState[listKey]) {
+                adminSection.classList.remove('hidden');
+                loadSuggestions();
+            } else {
+                adminSection.classList.add('hidden');
+                if (unsubscribeSuggestions) unsubscribeSuggestions();
+            }
+
+            loadWishlist();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.openImpressum = function() {
+            if (unsubscribeWishes) unsubscribeWishes();
+            if (unsubscribeSuggestions) unsubscribeSuggestions();
+            currentListKey = null;
+
+            homeView.classList.add('hidden');
+            listView.classList.add('hidden');
+            impressumView.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.goHome = function() {
+            if (unsubscribeWishes) unsubscribeWishes();
+            if (unsubscribeSuggestions) unsubscribeSuggestions();
+
+            currentListKey = null;
+            loginBox.classList.add('hidden');
+            listView.classList.add('hidden');
+            impressumView.classList.add('hidden');
+            homeView.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // ==========================================
+        // EASTER EGG: 10-KLICK TRIGGER & FLAPPY BIRD
         // ==========================================
         let keyClickCount = 0;
         let lastKeyClickTime = 0;
@@ -400,44 +504,6 @@
             document.getElementById('fb-final-score').textContent = fbScore;
             document.getElementById('fb-gameover-screen').classList.remove('hidden');
         }
-
-        // ==========================================
-        // NAVIGATION: STARTSEITE <-> LISTE
-        // ==========================================
-        window.openList = function(listKey) {
-            currentListKey = listKey;
-            const config = LISTS_CONFIG[listKey];
-
-            document.getElementById('active-list-title').textContent = config.title;
-            document.getElementById('active-list-subtitle').textContent = config.subtitle;
-
-            homeView.classList.add('hidden');
-            listView.classList.remove('hidden');
-            loginBox.classList.add('hidden');
-            passwordInput.value = '';
-            resetWishForm();
-
-            if (adminState[listKey]) {
-                adminSection.classList.remove('hidden');
-                loadSuggestions();
-            } else {
-                adminSection.classList.add('hidden');
-                if (unsubscribeSuggestions) unsubscribeSuggestions();
-            }
-
-            loadWishlist();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.goHome = function() {
-            if (unsubscribeWishes) unsubscribeWishes();
-            if (unsubscribeSuggestions) unsubscribeSuggestions();
-
-            currentListKey = null;
-            loginBox.classList.add('hidden');
-            listView.classList.add('hidden');
-            homeView.classList.remove('hidden');
-        };
 
         // ==========================================
         // ADMIN LOGIN (PRO LISTE GETRENNT)
